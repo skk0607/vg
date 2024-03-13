@@ -98,6 +98,7 @@ BaseMapper::find_mems_simple(string::const_iterator seq_begin,
     vector<MaximalExactMatch> mems;
     
     // an empty sequence matches the entire bwt
+    // C++ 迭代器, 表示字符串为空
     if (seq_begin == seq_end) {
         mems.emplace_back(MaximalExactMatch(seq_begin, seq_end,
                                             gcsa::range_type(0, gcsa->size() - 1)));
@@ -122,7 +123,8 @@ BaseMapper::find_mems_simple(string::const_iterator seq_begin,
     // the temporary MEM we'll build up in this process
     auto full_range = gcsa::range_type(0, gcsa->size() - 1);
     string::const_iterator curr_end = seq_end;
-    string::const_iterator cursor = seq_end - 1;
+    string::const_iterator cursor = seq_end - 1;//指向当前最后一个字符
+
     // start off looking at the last character in the query
     gcsa::range_type range = accelerate_mem_query(seq_begin, cursor);
     while (cursor >= seq_begin) {
@@ -215,6 +217,7 @@ BaseMapper::find_mems_simple(string::const_iterator seq_begin,
     }
     
     // reseed the long smems with shorter mems
+    // reseed 要求: MEM到达 reseed 的长度, 对于整个query read 只有一个 MEM
     if (reseed_length) {
         // find if there are any mems that should be reseeded
         // iterate through MEMs
@@ -3921,8 +3924,7 @@ double Mapper::compute_uniqueness(const Alignment& aln, const vector<MaximalExac
     vector<int> v; v.resize(aln.sequence().size());
     auto aln_begin = aln.sequence().begin();
     for (auto& mem : mems) {
-        // from the beginning to the end of the mem in the read
-        // add the count of hits to each position
+        //F
         for (int i = mem.begin - aln_begin; i < mem.end - aln_begin; ++i) {
             v[i] += mem.match_count;
         }
